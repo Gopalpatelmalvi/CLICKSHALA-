@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="क्लिक शाला - ग्रामीण राजकीय विद्यालयों को डिजिटल पहचान देने का राष्ट्रीय मिशन | Click Shala Mission 1 (2026-27)">
+    <title>क्लिक शाला | Click Shala — ग्रामीण विद्यालयों का डिजिटल सशक्तिकरण</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+    </script>
+    <style>
+        :root {
+            --navy-deep: #040a14;
+            --navy: #0A1628;
+            --navy-light: #0F2440;
+            --royal: #1A3A6B;
+            --orange: #FF5C00;
+            --orange-dark: #E04E00;
+            --saffron: #FF9933;
+            --green: #046A38;
+            --white: #FFFFFF;
+            --gray-50: #F8FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --radius-sm: 8px;
+            --radius: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 12px 35px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 24px 55px rgba(0, 0, 0, 0.14);
+            --transition: 0.3s cubic-bezier(0.3, 0.1, 0.2, 1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, sans-serif;
+            line-height: 1.7;
+            color: var(--gray-800);
+            background: var(--white);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hindi {
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+            line-height: 1.9;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(35px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes floatOrb {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                transform: translate(25px, -30px) scale(1.05);
+            }
+        }
+        @keyframes shimmer {
+            0% {
+                background-position: -400% center;
+            }
+            100% {
+                background-position: 400% center;
+            }
+        }
+        @keyframes pulseRing {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 92, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(255, 92, 0, 0);
+            }
+        }
+        @keyframes borderGlow {
+            0%,
+            100% {
+                border-color: rgba(255, 153, 51, 0.3);
+            }
+            50% {
+                border-color: rgba(255, 92, 0, 0.5);
+            }
+        }
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        @keyframes pulseGreen {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(4, 106, 56, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 18px rgba(4, 106, 56, 0);
+            }
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.3, 0.1, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 14px 0;
+            transition: all 0.4s ease;
+            background: transparent;
+        }
+        .navbar.scrolled {
+            background: rgba(4, 10, 20, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 10px 0;
+            box-shadow: 0 4px 35px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .navbar-inner {
+            max-width: 1260px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .nav-brand-text {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .nav-brand-text span {
+            color: var(--orange);
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.82);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12.5px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.09);
+        }
+        .nav-cta {
+            background: var(--orange) !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            animation: pulseRing 2.5s ease-in-out infinite;
+        }
+        .nav-cta:hover {
+            background: var(--orange-dark) !important;
+            animation: none;
+            box-shadow: 0 8px 25px rgba(255, 92, 0, 0.5) !important;
+        }
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+        .nav-user img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            transition: var(--transition);
+        }
+        .btn-logout:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            color: #fff;
+        }
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+            .nav-links.mobile-open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(4, 10, 20, 0.98);
+                backdrop-filter: blur(22px);
+                padding: 16px;
+                gap: 4px;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(155deg, #020810 0%, #040a14 18%, #0A1628 48%, #0F2440 72%, #1A3A6B 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+            padding: 110px 18px 60px;
+        }
+        .hero-bg-grid {
+            position: absolute;
+            inset: 0;
+            opacity: 0.04;
+            background-image: radial-gradient(circle at 22% 35%, #FF9933 1.5px, transparent 1.5px), radial-gradient(circle at 72% 62%, #FF5C00 1.5px, transparent 1.5px), radial-gradient(circle at 48% 48%, #046A38 1.5px, transparent 1.5px);
+            background-size: 48px 48px, 62px 62px, 52px 52px;
+        }
+        .hero-orb {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(100px);
+            opacity: 0.26;
+        }
+        .hero-orb-1 {
+            width: 460px;
+            height: 460px;
+            background: radial-gradient(circle, rgba(255, 153, 51, 0.45), transparent);
+            top: -20%;
+            right: -12%;
+            animation: floatOrb 8s ease-in-out infinite;
+        }
+        .hero-orb-2 {
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle, rgba(4, 106, 56, 0.35), transparent);
+            bottom: -22%;
+            left: -8%;
+            animation: floatOrb 10s ease-in-out infinite reverse;
+        }
+        .hero-inner {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 840px;
+            width: 100%;
+        }
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 153, 51, 0.12);
+            border: 1px solid rgba(255, 153, 51, 0.28);
+            color: var(--saffron);
+            padding: 7px 18px;
+            border-radius: 35px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+        .hero-pill-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--saffron);
+            border-radius: 50%;
+            animation: scaleIn 1.6s ease-in-out infinite;
+        }
+        .hero-title {
+            font-size: clamp(28px, 5vw, 54px);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.14;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+        .gradient-text {
+            background: linear-gradient(130deg, #FF9933 0%, #FF5C00 30%, #FF7A30 60%, #FF9933 100%);
+            background-size: 250% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3.5s linear infinite;
+        }
+        .hero-desc {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 36px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 12px 26px;
+            border-radius: 36px;
+            font-weight: 600;
+            font-size: 13.5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .btn-primary {
+            background: var(--orange);
+            color: #fff;
+            box-shadow: 0 6px 22px rgba(255, 92, 0, 0.38);
+            animation: pulseRing 2.5s ease-in-out infinite;
+        }
+        .btn-primary:hover {
+            background: var(--orange-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(255, 92, 0, 0.5);
+            animation: none;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.24);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.55);
+            transform: translateY(-3px);
+        }
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 44px;
+            flex-wrap: wrap;
+        }
+        .hero-stat-item {
+            text-align: center;
+        }
+        .hero-stat-value {
+            font-size: 34px;
+            font-weight: 900;
+            color: #fff;
+            display: block;
+        }
+        .hero-stat-value.accent {
+            background: linear-gradient(135deg, #FF9933, #FF5C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-stat-label {
+            font-size: 10.5px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+            display: block;
+        }
+        .tiranga-line {
+            width: 140px;
+            height: 3px;
+            margin: 34px auto 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #FF9933 33%, #fff 33%, #fff 66%, #046A38 66%);
+            opacity: 0.55;
+        }
+        .scroll-hint {
+            position: absolute;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: pointer;
+            opacity: 0.5;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .section {
+            padding: 70px 18px;
+        }
+        .section-alt {
+            background: var(--gray-50);
+        }
+        .section-dark {
+            background: var(--navy);
+            color: #fff;
+        }
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+        .section-head {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .section-tag {
+            display: inline-block;
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-size: clamp(22px, 3.5vw, 34px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            color: var(--navy);
+        }
+        .section-dark .section-title {
+            color: #fff;
+        }
+        .section-desc {
+            font-size: 14px;
+            color: var(--gray-500);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .section-dark .section-desc {
+            color: rgba(255, 255, 255, 0.52);
+        }
+        .section-divider {
+            width: 44px;
+            height: 4px;
+            background: var(--orange);
+            border-radius: 3px;
+            margin: 14px auto;
+        }
+
+        .vision-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .vision-row {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .founder-card {
+            background: linear-gradient(140deg, #FFF8F0, #fff, #F4F8FF);
+            border-radius: var(--radius-xl);
+            padding: 40px 28px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: var(--transition);
+        }
+        .founder-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-3px);
+        }
+        .founder-body {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+        .founder-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy), var(--orange));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 12px 26px rgba(255, 92, 0, 0.22);
+            animation: floatOrb 5s ease-in-out infinite;
+        }
+        .founder-avatar span {
+            font-size: 30px;
+            font-weight: 900;
+            color: #fff;
+        }
+        @media (max-width: 500px) {
+            .founder-body {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .founder-avatar {
+                margin: 0 auto;
+            }
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 768px) {
+            .pillars-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 400px) {
+            .pillars-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .pillar-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-lg);
+            padding: 24px 14px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .pillar-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 92, 0, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .guidelines-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 768px) {
+            .guidelines-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .guideline-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 24px 18px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .guideline-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+        .guideline-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 12px;
+            right: 12px;
+            height: 3px;
+            border-radius: 0 0 3px 3px;
+        }
+        .guideline-card.g1::before {
+            background: var(--orange);
+        }
+        .guideline-card.g2::before {
+            background: var(--saffron);
+        }
+        .guideline-card.g3::before {
+            background: var(--green);
+        }
+        .guideline-num {
+            font-size: 38px;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.022);
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            pointer-events: none;
+        }
+        .terms-box {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            margin-top: 14px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--orange);
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.8;
+        }
+
+        .timeline-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            position: relative;
+            padding-left: 36px;
+        }
+        .timeline-wrap::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: linear-gradient(180deg, #FF9933 0%, #FF5C00 35%, #FF5C00 65%, #046A38 100%);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 28px;
+            padding-left: 18px;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -27px;
+            top: 4px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2.5px solid var(--orange);
+            box-shadow: 0 0 0 3px rgba(255, 92, 0, 0.1);
+            z-index: 2;
+            transition: var(--transition);
+        }
+        .timeline-item:last-child .timeline-dot {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(4, 106, 56, 0.1);
+        }
+        .timeline-date {
+            font-weight: 700;
+            color: var(--orange);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 2px;
+        }
+        .timeline-item:last-child .timeline-date {
+            color: var(--green);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 768px) {
+            .benefits-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 400px) {
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .benefit-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 24px 14px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid transparent;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .benefit-card:hover {
+            border-color: var(--orange);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .priority-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 768px) {
+            .priority-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .priority-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 26px 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-top: 4px solid;
+            cursor: pointer;
+        }
+        .priority-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+        .priority-card.p1 {
+            border-top-color: #E91E63;
+        }
+        .priority-card.p2 {
+            border-top-color: var(--green);
+        }
+        .priority-card.p3 {
+            border-top-color: #7C3AED;
+        }
+
+        .cta-block {
+            background: linear-gradient(145deg, var(--navy-deep), #0F2440);
+            text-align: center;
+            padding: 60px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-block::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 40%, rgba(255, 92, 0, 0.13), transparent 60%);
+            pointer-events: none;
+        }
+        .cta-inner {
+            position: relative;
+            z-index: 2;
+        }
+        .deadline-tag {
+            display: inline-block;
+            background: rgba(255, 153, 51, 0.13);
+            border: 1px solid rgba(255, 153, 51, 0.3);
+            color: var(--saffron);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 22px;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        .stakeholder-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 768px) {
+            .stakeholder-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 400px) {
+            .stakeholder-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .stakeholder-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 20px 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .stakeholder-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-3px);
+        }
+
+        .footer {
+            background: #020810;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 44px 18px 14px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 24px;
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 400px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .footer h4 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .footer a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 4px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .footer a:hover {
+            color: var(--saffron);
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 32px;
+            padding-top: 14px;
+            text-align: center;
+            font-size: 10.5px;
+            max-width: 1140px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            padding: 16px;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            padding: 30px 22px;
+            max-width: 720px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+            animation: scaleIn 0.3s ease;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            color: var(--gray-400);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 5;
+        }
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--navy);
+        }
+        .modal h2 {
+            font-size: 20px;
+            color: var(--navy);
+            margin-bottom: 6px;
+            padding-right: 30px;
+        }
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--orange);
+            margin: 18px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--navy);
+            margin-bottom: 3px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: var(--gray-50);
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--orange);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(255, 92, 0, 0.06);
+        }
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 500px) {
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+            .modal {
+                padding: 20px 14px;
+            }
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .note-box {
+            background: #FFF9F2;
+            border-left: 4px solid var(--orange);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--gray-600);
+            line-height: 1.7;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--orange);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 18px;
+        }
+        .submit-btn:hover {
+            background: var(--orange-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 92, 0, 0.4);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .success-msg {
+            background: #E8F5E9;
+            color: var(--green);
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 14px;
+            display: none;
+        }
+        .error-msg {
+            background: #FFEBEE;
+            color: #c62828;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 14px;
+            display: none;
+        }
+        .csm-id-display {
+            background: var(--navy);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: var(--radius);
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            display: inline-block;
+            margin: 12px 0;
+            animation: pulseGreen 2s ease-in-out infinite;
+        }
+        .auth-modal {
+            max-width: 420px;
+            text-align: center;
+        }
+        .btn-google {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            color: #333;
+            padding: 13px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid var(--gray-200);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            margin-top: 18px;
+        }
+        .btn-google:hover {
+            background: #f9f9f9;
+            border-color: var(--gray-300);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="#" class="nav-brand">
+                <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="1" y="1" width="36" height="36" rx="10" fill="url(#ng)" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><text x="19" y="26" text-anchor="middle" fill="#fff" font-size="16" font-weight="800">CS</text><defs><linearGradient id="ng" x1="0" y1="0" x2="38" y2="38"><stop offset="0%" stop-color="#1A3A6B"/><stop offset="100%" stop-color="#FF5C00"/></linearGradient></defs></svg>
+                <span class="nav-brand-text">Click<span>Shala</span></span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#vision">विजन</a></li>
+                <li><a href="#guidelines">दिशा-निर्देश</a></li>
+                <li><a href="#timeline">यात्रा</a></li>
+                <li><a href="#benefits">लाभ</a></li>
+                <li><a href="#" onclick="openPageModal('privacy')">प्राइवेसी पॉलिसी</a></li>
+                <li><a href="#" onclick="openPageModal('terms')">नियम एवं शर्तें</a></li>
+                <li><a href="#" onclick="openPageModal('mou')">MoU</a></li>
+                <li><a href="#" class="nav-cta" onclick="handleApplyClick()">अप्लाई करें</a></li>
+                <li id="navUserArea" style="display:none;"><span class="nav-user"><img id="navUserPhoto" src="" alt=""><span id="navUserName"></span><button class="btn-logout" onclick="signOut()">लॉगआउट</button></span></li>
+            </ul>
+            <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')" aria-label="Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-inner reveal">
+            <div class="hero-pill"><span class="hero-pill-dot"></span> मिशन 1 &middot; सत्र 2026-27</div>
+            <h1 class="hero-title hindi">ग्रामीण विद्यालयों का<br><span class="gradient-text">डिजिटल सशक्तिकरण</span></h1>
+            <p class="hero-desc hindi">राजकीय माध्यमिक एवं उच्च माध्यमिक विद्यालयों को उनकी स्वयं की निःशुल्क वेबसाइट प्रदान कर, डिजिटल इंडिया के सपने को साकार करने का राष्ट्रीय मिशन।</p>
+            <div class="hero-actions">
+                <a href="#" class="btn btn-primary" onclick="handleApplyClick();return false;">अप्लाई करें</a>
+                <a href="#vision" class="btn btn-outline">और जानें</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat-item"><span class="hero-stat-value accent">21+</span><span class="hero-stat-label">प्रथम चरण के लक्षित विद्यालय</span></div>
+                <div class="hero-stat-item"><span class="hero-stat-value">₹0</span><span class="hero-stat-label">पूर्णतः निःशुल्क लागत</span></div>
+                <div class="hero-stat-item"><span class="hero-stat-value accent">100%</span><span class="hero-stat-label">डेटा सुरक्षा</span></div>
+            </div>
+            <div class="tiranga-line"></div>
+        </div>
+        <div class="scroll-hint"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+    </section>
+
+    <section class="section section-alt" id="vision">
+        <div class="container">
+            <div class="vision-row">
+                <div class="reveal">
+                    <svg viewBox="0 0 420 330" fill="none"><rect x="70" y="48" width="280" height="235" rx="14" fill="#fff" stroke="#1A3A6B" stroke-width="2"/><rect x="86" y="64" width="248" height="14" rx="4" fill="#1A3A6B"/><circle cx="104" cy="108" r="12" fill="#FF5C00" opacity="0.14"/><rect x="124" y="100" width="170" height="5" rx="2.5" fill="#E5E7EB"/><rect x="86" y="136" width="120" height="95" rx="9" fill="#F3F4F6"/><rect x="218" y="136" width="116" height="42" rx="9" fill="#F3F4F6"/></svg>
+                </div>
+                <div class="reveal">
+                    <span class="section-tag">हमारा विजन</span>
+                    <h3 class="hindi" style="font-size:22px;color:var(--navy);">भारत के ग्रामीण विद्यालयों का अगला अध्याय अब डिजिटल होगा</h3>
+                    <p class="hindi" style="color:var(--gray-500);font-size:14px;">भारत की अगली पीढ़ी की प्रतिभाएँ उन ग्रामीण और सरकारी विद्यालयों से निकल रही हैं, जिन्हें अक्सर आधुनिक डिजिटल इकोसिस्टम द्वारा अनदेखा कर दिया जाता है। 'क्लिक शाला' इन विद्यालयों को उनकी स्वयं की आधिकारिक वेबसाइट प्रदान कर, उनकी पूरी क्षमता का अहसास कराने और विश्व स्तर पर पहचान दिलाने में मदद करना चाहता है।</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="founder-card reveal">
+                <div class="founder-body">
+                    <div class="founder-avatar"><span>GP</span></div>
+                    <div>
+                        <p class="hindi" style="font-size:15px;font-style:italic;color:#333;">मैंने इसी माटी में जन्म लिया है। मैं इसी ग्रामीण परिवेश का हिस्सा हूँ। यहाँ के विद्यालयों ने मुझे ज्ञान और उद्देश्य दिया। और मैं उनके डिजिटल भविष्य के निर्माण के लिए <strong>गहराई से प्रतिबद्ध हूँ।</strong></p>
+                        <p style="font-weight:700;color:var(--navy);margin-top:8px;">— गोपाल पटेल</p>
+                        <p style="font-size:12px;color:var(--gray-500);margin-top:2px;">'क्लिक शाला' सिर्फ एक प्रोजेक्ट नहीं — यह एक मूवमेंट है।</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-dark" id="pillars">
+        <div class="container">
+            <div class="section-head reveal"><span class="section-tag">हमारे सिद्धांत</span><h2 class="section-title">चार स्तंभ, एक मिशन</h2><div class="section-divider"></div></div>
+            <div class="pillars-grid">
+                <div class="pillar-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(255,92,0,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><h3 style="font-size:13px;color:#fff;">शिक्षा का डिजिटलीकरण</h3><p style="font-size:11px;color:rgba(255,255,255,0.48);">सरकारी स्कूलों को उनकी आधुनिक और स्वतंत्र वेब पहचान दिलाना।</p></div>
+                <div class="pillar-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(255,153,51,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF9933" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><h3 style="font-size:13px;color:#fff;">ग्रासरूट पहले</h3><p style="font-size:11px;color:rgba(255,255,255,0.48);">प्रतिभा जहाँ कहीं भी हो, ग्रामीण स्तर से शुरुआत करके उसे वैश्विक मंच तक पहुँचाना।</p></div>
+                <div class="pillar-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(4,106,56,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#046A38" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/></svg></div><h3 style="font-size:13px;color:#fff;">सुरक्षित एवं पारदर्शी</h3><p style="font-size:11px;color:rgba(255,255,255,0.48);">शाला दर्पण की सार्वजनिक जानकारी का उपयोग कर 100% डेटा सुरक्षा।</p></div>
+                <div class="pillar-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><circle cx="11" cy="11" r="2"/></svg></div><h3 style="font-size:13px;color:#fff;">आत्मनिर्भर विद्यालय</h3><p style="font-size:11px;color:rgba(255,255,255,0.48);">वेबसाइट का पूरा नियंत्रण और प्रबंधन सीधे संस्था प्रधान के हाथों में।</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-alt" id="guidelines">
+        <div class="container">
+            <div class="section-head reveal"><span class="section-tag">दिशा-निर्देश</span><h2 class="section-title">मिशन 1 &middot; पात्रता एवं चयन</h2><p class="section-desc">सत्र 2026-27 हेतु राजकीय विद्यालयों के लिए डिजिटल एकीकरण प्रोजेक्ट</p><div class="section-divider"></div></div>
+            <div class="guidelines-grid">
+                <div class="guideline-card g1 reveal"><span class="guideline-num">01</span><h3 style="font-size:15px;color:var(--navy);">पात्रता</h3><ul style="list-style:none;"><li style="font-size:12.5px;color:var(--gray-600);padding:2px 0;">यह मिशन केवल राजकीय माध्यमिक एवं उच्च माध्यमिक विद्यालयों के लिए है।</li><li style="font-size:12.5px;color:var(--gray-600);padding:2px 0;">प्राथमिक एवं उच्च प्राथमिक विद्यालय इस चरण में पात्र नहीं हैं।</li></ul></div>
+                <div class="guideline-card g2 reveal"><span class="guideline-num">02</span><h3 style="font-size:15px;color:var(--navy);">चयन मापदंड</h3><ul style="list-style:none;"><li style="font-size:12.5px;color:var(--gray-600);padding:2px 0;">चयन पूर्णतः 'पहले आओ-पहले पाओ' के आधार पर किया जाएगा।</li><li style="font-size:12.5px;color:var(--gray-600);padding:2px 0;">आवेदन सबमिट करने के पश्चात CSM कार्यालय द्वारा समीक्षा की जाएगी।</li></ul></div>
+                <div class="guideline-card g3 reveal"><span class="guideline-num">03</span><h3 style="font-size:15px;color:var(--navy);">डेटा सुरक्षा</h3><ul style="list-style:none;"><li style="font-size:12.5px;color:var(--gray-600);padding:2px 0;">आवेदन के समय कोई निजी या गोपनीय जानकारी नहीं देनी होगी।</li><li style="font-size:12.5px;color:var(--gray-600);padding:2px 0;">केवल शाला दर्पण सिटिजन विंडो पर सार्वजनिक जानकारी आवश्यक।</li></ul></div>
+            </div>
+            <div class="terms-box reveal"><strong style="color:var(--navy);">आधिकारिक नियम एवं शर्तें:</strong> अधिकृत डेटा प्रस्तुतीकरण — वेबसाइट निर्माण हेतु सामग्री संस्था प्रधान द्वारा प्रमाणित करके CSM को उपलब्ध करवानी होगी। सामग्री की प्रामाणिकता की पूर्ण जिम्मेदारी विद्यालय प्रशासन की होगी। उपयोग की सीमा — वेबसाइट का उपयोग केवल शैक्षणिक, सूचनात्मक एवं आधिकारिक कार्यों हेतु। सर्वाधिकार — नियमों के उल्लंघन पर CSM के पास सेवा निलंबित करने का पूर्ण अधिकार।</div>
+        </div>
+    </section>
+
+    <section class="section" id="timeline">
+        <div class="container">
+            <div class="section-head reveal"><span class="section-tag">क्लिक शाला यात्रा</span><h2 class="section-title">आइडिया से डिजिटल लॉन्च स्टेज तक</h2><div class="section-divider"></div></div>
+            <div class="timeline-wrap reveal">
+                <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">01 जुलाई 2026</div><div class="timeline-title" style="font-weight:700;color:var(--navy);">लॉन्च — मिशन-1 की आधिकारिक शुरुआत</div><div class="timeline-desc" style="font-size:13px;color:var(--gray-500);">क्लिक शाला मिशन-1 का विधिवत शुभारंभ। सभी पात्र विद्यालयों से आवेदन आमंत्रित।</div></div>
+                <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">01-15 जुलाई 2026</div><div class="timeline-title" style="font-weight:700;color:var(--navy);">आवेदन विंडो खुली</div><div class="timeline-desc" style="font-size:13px;color:var(--gray-500);">राजकीय माध्यमिक एवं उच्च माध्यमिक विद्यालय ऑनलाइन आवेदन सबमिट कर सकते हैं।</div></div>
+                <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">16-20 जुलाई 2026</div><div class="timeline-title" style="font-weight:700;color:var(--navy);">डेटा एकत्रीकरण एवं समीक्षा</div><div class="timeline-desc" style="font-size:13px;color:var(--gray-500);">चयनित विद्यालयों से शाला दर्पण की सार्वजनिक मूलभूत जानकारी प्राप्त कर समीक्षा।</div></div>
+                <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">21-31 जुलाई 2026</div><div class="timeline-title" style="font-weight:700;color:var(--navy);">पोर्टल निर्माण एवं टेस्टिंग</div><div class="timeline-desc" style="font-size:13px;color:var(--gray-500);">क्लिक शाला टीम द्वारा सभी 21 वेब पोर्टल का निर्माण और लाइव टेस्टिंग।</div></div>
+                <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">01 अगस्त 2026</div><div class="timeline-title" style="font-weight:700;color:var(--navy);">ग्रैंड डिजिटल लॉन्च</div><div class="timeline-desc" style="font-size:13px;color:var(--gray-500);">सभी 21 चयनित विद्यालयों की वेबसाइट्स का एक साथ औपचारिक डिजिटल लॉन्च।</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-alt" id="benefits">
+        <div class="container">
+            <div class="section-head reveal"><span class="section-tag">सुविधाएँ एवं लाभ</span><h2 class="section-title">डिजिटल इंडिया का लॉन्चपैड</h2><p class="section-desc">आज डिजिटल पहचान, कल बड़ा विस्तार</p><div class="section-divider"></div></div>
+            <div class="benefits-grid">
+                <div class="benefit-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(26,58,107,0.07);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A3A6B" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><h3 style="font-size:13px;color:var(--navy);">स्वतंत्र वेब पहचान</h3><p style="font-size:11.5px;color:var(--gray-500);">विद्यालय की स्वयं की एक आधुनिक और स्वतंत्र वेब उपस्थिति।</p></div>
+                <div class="benefit-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(255,92,0,0.07);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M21 15H7l-4 4V5h18z"/></svg></div><h3 style="font-size:13px;color:var(--navy);">पारदर्शिता और संवाद</h3><p style="font-size:11.5px;color:var(--gray-500);">शैक्षिक उपलब्धियों और कार्यक्रमों की जानकारी अभिभावकों एवं समाज तक।</p></div>
+                <div class="benefit-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(4,106,56,0.07);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#046A38" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><h3 style="font-size:13px;color:var(--navy);">तकनीकी सशक्तिकरण</h3><p style="font-size:11.5px;color:var(--gray-500);">बिना किसी आर्थिक खर्च के तकनीकी रूप से अपग्रेड।</p></div>
+                <div class="benefit-card reveal"><div style="width:44px;height:44px;border-radius:12px;background:rgba(124,58,237,0.07);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/></svg></div><h3 style="font-size:13px;color:var(--navy);">पूर्ण डेटा नियंत्रण</h3><p style="font-size:11.5px;color:var(--gray-500);">तैयार वेबसाइट का हैंडओवर सीधे संस्था प्रधान को।</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head reveal"><span class="section-tag">विशेष प्राथमिकता</span><h2 class="section-title">प्राथमिकता श्रेणी</h2><div class="section-divider"></div></div>
+            <div class="priority-grid">
+                <div class="priority-card p1 reveal"><svg width="40" height="40" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="24" fill="#FCE4EC" stroke="#E91E63" stroke-width="2"/></svg><h3>बालिका विद्यालय</h3><p style="font-size:12px;color:var(--gray-500);">बालिका शिक्षा और महिला सशक्तिकरण को बढ़ावा देने वाले सरकारी विद्यालय।</p></div>
+                <div class="priority-card p2 reveal"><svg width="40" height="40" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="24" fill="#E8F5E9" stroke="#046A38" stroke-width="2"/></svg><h3>सुदूर ग्रामीण विद्यालय</h3><p style="font-size:12px;color:var(--gray-500);">पंचायत मुख्यालय से दूर, जहाँ तकनीकी पहुँच सबसे कम है।</p></div>
+                <div class="priority-card p3 reveal"><svg width="40" height="40" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="24" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/></svg><h3>नवाचारी विद्यालय</h3><p style="font-size:12px;color:var(--gray-500);">शिक्षा और सह-शैक्षिक गतिविधियों में नए प्रयोग करने वाले आदर्श विद्यालय।</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-block" id="apply">
+        <div class="cta-inner reveal">
+            <h2 class="hindi" style="color:#fff;font-size:26px;font-weight:800;">साथ मिलकर, ग्रामीण विद्यालयों को डिजिटल बनाएं</h2>
+            <p style="color:rgba(255,255,255,0.56);">आपके विद्यालय का हर छात्र, एक मजबूत भारत का भविष्य है। यह आपका क्षण है। यह आपका मंच है।</p>
+            <div class="deadline-tag">आवेदन की अंतिम तिथि: 15 जुलाई 2026</div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                <a href="#" class="btn btn-primary" style="font-size:15px;padding:15px 34px;" onclick="handleApplyClick();return false;">अप्लाई करें</a>
+                <a href="#" class="btn btn-outline" style="font-size:15px;padding:15px 34px;">लॉग-इन करें</a>
+            </div>
+            <p style="margin-top:16px;font-size:12px;opacity:0.5;color:#fff;">जो विद्यालय प्रथम 21 की सूची में स्थान नहीं पा सकेंगे, उनके लिए आगे नए दिशा-निर्देश जारी होंगे।</p>
+        </div>
+    </section>
+
+    <section class="section section-alt">
+        <div class="container">
+            <div class="section-head reveal"><h2 class="section-title">अप्लाई / जुड़ें</h2><div class="section-divider"></div></div>
+            <div class="stakeholder-grid">
+                <div class="stakeholder-card reveal"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5C00" stroke-width="2"><path d="M3 9l9-7 9 7v11H3z"/></svg><h3 style="font-size:12px;">राजकीय विद्यालय</h3><p style="font-size:10px;color:var(--gray-500);">आवेदन हेतु</p></div>
+                <div class="stakeholder-card reveal"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF9933" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27z"/></svg><h3 style="font-size:12px;">दानदाता / भामाशाह</h3><p style="font-size:10px;color:var(--gray-500);">सर्वर एवं डोमेन सहयोग</p></div>
+                <div class="stakeholder-card reveal"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#046A38" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><h3 style="font-size:12px;">पंचायत प्रतिनिधि</h3><p style="font-size:10px;color:var(--gray-500);">गाँव के स्कूल की अनुशंसा</p></div>
+                <div class="stakeholder-card reveal"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><circle cx="9" cy="7" r="4"/></svg><h3 style="font-size:12px;">स्वयंसेवक / IT मेंटर</h3><p style="font-size:10px;color:var(--gray-500);">डिजिटल टीम से जुड़ें</p></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div><h4>क्लिक शाला</h4><p style="font-size:11px;opacity:0.6;">गोपाल पटेल द्वारा एक स्वतंत्र डिजिटल पहल</p></div>
+            <div><h4>त्वरित लिंक</h4><a href="#vision">विजन</a><a href="#guidelines">दिशा-निर्देश</a><a href="#timeline">यात्रा</a><a href="#benefits">लाभ</a></div>
+            <div><h4>कानूनी</h4><a href="#" onclick="openPageModal('privacy');return false;">प्राइवेसी पॉलिसी</a><a href="#" onclick="openPageModal('terms');return false;">नियम एवं शर्तें</a><a href="#" onclick="openPageModal('mou');return false;">MoU / सहमति पत्र</a></div>
+            <div><h4>संपर्क</h4><p style="font-size:11px;">contact@clickshala.org</p><p style="font-size:11px;">+91 6375241780</p><p style="font-size:11px;">पारलू, बालोतरा (राज.) 344027</p></div>
+        </div>
+        <div class="footer-bottom"><p>Copyright 2026. Click Shala. All Rights Reserved. | <a href="#" onclick="openPageModal('privacy');return false;">प्राइवेसी पॉलिसी</a> | <a href="#" onclick="openPageModal('terms');return false;">नियम एवं शर्तें</a></p></div>
+    </footer>
+
+    <!-- AUTH MODAL -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal auth-modal">
+            <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+            <h2 class="hindi">साइन इन आवश्यक</h2>
+            <p style="font-size:13px;color:var(--gray-500);">आवेदन करने से पहले कृपया Google से साइन इन करें।</p>
+            <button class="btn-google" onclick="signInWithGoogle()">
+                <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Sign in with Google
+            </button>
+            <p style="font-size:10px;color:var(--gray-400);margin-top:14px;">आपका डेटा सुरक्षित है। केवल आवेदन प्रमाणीकरण हेतु।</p>
+        </div>
+    </div>
+
+    <!-- APPLY FORM MODAL -->
+    <div class="modal-overlay" id="applyFormModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeApplyFormModal()">&times;</button>
+            <h2 class="hindi">क्लिक शाला मिशन-1: विद्यालय विवरण प्रपत्र</h2>
+            <p style="font-size:12px;color:var(--gray-500);">(निःशुल्क वेबसाइट निर्माण हेतु आवश्यक जानकारी)</p>
+            <p style="font-size:12px;color:var(--gray-500);margin-top:4px;">कृपया अपने विद्यालय की आधिकारिक वेबसाइट के निर्माण हेतु निम्नलिखित जानकारी सही और सटीक रूप से भरकर भेजें:</p>
+            <form id="applicationForm" onsubmit="submitApplication(event)">
+                <div class="form-section-title">भाग 1: विद्यालय की सामान्य जानकारी</div>
+                <div class="form-group"><label>1. विद्यालय का पूरा नाम *</label><input type="text" id="schoolName" required placeholder="विद्यालय का पूरा नाम लिखें"></div>
+                <div class="form-row-2">
+                    <div class="form-group"><label>2. विद्यालय की स्थापना का वर्ष *</label><input type="number" id="estYear" required placeholder="जैसे: 1985" min="1900" max="2026"></div>
+                    <div class="form-group"><label>3. शाला दर्पण कोड *</label><input type="text" id="shalaDarpanCode" required placeholder="Shala Darpan Code"></div>
+                </div>
+                <div class="form-group"><label>4. UDISE+ आईडी *</label><input type="text" id="udiseId" required placeholder="UDISE+ ID"></div>
+
+                <div class="form-section-title">भाग 2: संपर्क एवं पता विवरण</div>
+                <div class="form-group"><label>5. विद्यालय का पूरा पता *</label><textarea id="address" rows="2" required placeholder="पूरा पता लिखें"></textarea></div>
+                <div class="form-row-2">
+                    <div class="form-group"><label>6. जिला *</label><input type="text" id="district" required placeholder="जिला"></div>
+                    <div class="form-group"><label>7. पिन कोड *</label><input type="text" id="pinCode" required placeholder="पिन कोड" pattern="[0-9]{6}"></div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group"><label>8. आधिकारिक ईमेल आईडी *</label><input type="email" id="email" required placeholder="school@example.com"></div>
+                    <div class="form-group"><label>9. संपर्क नंबर (मोबाइल/लैंडलाइन) *</label><input type="tel" id="phone" required placeholder="मोबाइल नंबर" pattern="[0-9]{10}"></div>
+                </div>
+
+                <div class="form-section-title">भाग 3: संस्था प्रधान (Principal) का विवरण</div>
+                <div class="form-group"><label>10. संस्था प्रधान / प्रधानाचार्य का नाम *</label><input type="text" id="principalName" required placeholder="प्रधानाचार्य का पूरा नाम"></div>
+                <div class="form-group"><label>11. संस्था प्रधान का फोटो</label><input type="file" id="principalPhoto" accept="image/*" style="padding:8px;"><small style="color:var(--gray-500);">कृपया फॉर्म के साथ एक अच्छी क्वालिटी का फोटो अवश्य भेजें</small></div>
+
+                <div class="form-section-title">भाग 4: बुनियादी सुविधाएं (Infrastructure)</div>
+                <div class="form-group"><label>12. कंप्यूटर लैब सुविधा *</label><div class="radio-group"><label><input type="radio" name="computerLab" value="हाँ" required> हाँ</label><label><input type="radio" name="computerLab" value="नहीं"> नहीं</label></div></div>
+                <div class="form-group"><label>13. पुस्तकालय (Library) सुविधा *</label><div class="radio-group"><label><input type="radio" name="library" value="हाँ" required> हाँ</label><label><input type="radio" name="library" value="नहीं"> नहीं</label></div></div>
+                <div class="form-group"><label>14. स्मार्ट क्लासरूम सुविधा *</label><div class="radio-group"><label><input type="radio" name="smartClass" value="हाँ" required> हाँ</label><label><input type="radio" name="smartClass" value="नहीं"> नहीं</label></div></div>
+
+                <div class="form-section-title">भाग 5: शैक्षणिक प्रदर्शन (Academic Record)</div>
+                <div class="form-group"><label>15. पिछले वर्षों का RBSE बोर्ड परीक्षा परिणाम</label><textarea id="pastResults" rows="3" placeholder="जैसे: सत्र 2024-25: 87%, सत्र 2023-24: 82%, सत्र 2022-23: 78%, सत्र 2021-22: 75%, सत्र 2020-21: 72%"></textarea><small style="color:var(--gray-500);">पिछले 5 वर्षों का उत्तीर्ण प्रतिशत (%) एक साथ लिखें</small></div>
+
+                <div class="form-section-title">भाग 6: विद्यालय की तस्वीरें (School Photographs)</div>
+                <p style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">16. विद्यालय के 5 उच्च गुणवत्ता (High-Quality) वाले फोटो — कृपया अपने विद्यालय की 5 स्पष्ट और शानदार तस्वीरें सॉफ्ट कॉपी में भेजें:</p>
+                <div class="form-group"><label>फोटो 1: विद्यालय का मुख्य भवन / मेन गेट *</label><input type="file" id="photo1" accept="image/*" required></div>
+                <div class="form-group"><label>फोटो 2: कंप्यूटर लैब या IT कक्ष *</label><input type="file" id="photo2" accept="image/*" required></div>
+                <div class="form-group"><label>फोटो 3: स्मार्ट क्लासरूम या पुस्तकालय *</label><input type="file" id="photo3" accept="image/*" required></div>
+                <div class="form-group"><label>फोटो 4: खेल का मैदान या प्रार्थना सभा *</label><input type="file" id="photo4" accept="image/*" required></div>
+                <div class="form-group"><label>फोटो 5: विद्यालय की कोई अन्य विशेष गतिविधि या सामूहिक तस्वीर *</label><input type="file" id="photo5" accept="image/*" required></div>
+
+                <div class="note-box"><strong>नोट:</strong> यह जानकारी केवल आपके विद्यालय की वेबसाइट पर सार्वजनिक रूप से प्रदर्शित करने हेतु एकत्रित की जा रही है। कृपया सभी विवरण प्रमाणित करके ही भेजें।<br><strong>— टीम क्लिक शाला</strong></div>
+                <div class="success-msg" id="successMsg"></div>
+                <div class="error-msg" id="errorMsg"></div>
+                <button type="submit" class="submit-btn" id="submitBtn">फॉर्म जमा करें</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAGE MODAL -->
+    <div class="modal-overlay" id="pageModal">
+        <div class="modal"><button class="modal-close" onclick="closePageModal()">&times;</button><div id="pageContent"></div></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNiigKF-lZ5mHJZ6BXT6uU8gvgJ4TN3vc",
+            authDomain: "local-book-of-india.firebaseapp.com",
+            databaseURL: "https://local-book-of-india-default-rtdb.firebaseio.com",
+            projectId: "local-book-of-india",
+            storageBucket: "local-book-of-india.firebasestorage.app",
+            messagingSenderId: "369669712580",
+            appId: "1:369669712580:web:8328ff715b1560dad5b791"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        let currentUser = null;
+
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            const navUserArea = document.getElementById('navUserArea');
+            if (user) {
+                navUserArea.style.display = 'block';
+                document.getElementById('navUserName').textContent = user.displayName || 'User';
+                document.getElementById('navUserPhoto').src = user.photoURL || '';
+            } else {
+                navUserArea.style.display = 'none';
+            }
+        });
+
+        function handleApplyClick() {
+            if (currentUser) { openApplyFormModal(); } else { openAuthModal(); }
+        }
+
+        function signInWithGoogle() {
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => { closeAuthModal();
+                openApplyFormModal(); }).catch(e => alert('साइन इन विफल: ' + e.message));
+        }
+
+        function signOut() { auth.signOut();
+            closeApplyFormModal(); }
+
+        function openAuthModal() { document.getElementById('authModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; }
+
+        function closeAuthModal() { document.getElementById('authModal').classList.remove('active');
+            document.body.style.overflow = ''; }
+        document.getElementById('authModal').addEventListener('click', function(e) { if (e.target === this)
+            closeAuthModal(); });
+
+        function openApplyFormModal() { document.getElementById('applyFormModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; }
+
+        function closeApplyFormModal() { document.getElementById('applyFormModal').classList.remove('active');
+            document.body.style.overflow = ''; }
+        document.getElementById('applyFormModal').addEventListener('click', function(e) { if (e.target === this)
+            closeApplyFormModal(); });
+
+        function openPageModal(page) {
+            document.getElementById('pageModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            const c = document.getElementById('pageContent');
+            if (page === 'privacy') c.innerHTML = getPrivacyHTML();
+            if (page === 'terms') c.innerHTML = getTermsHTML();
+            if (page === 'mou') c.innerHTML = getMouHTML();
+        }
+
+        function closePageModal() { document.getElementById('pageModal').classList.remove('active');
+            document.body.style.overflow = ''; }
+        document.getElementById('pageModal').addEventListener('click', function(e) { if (e.target === this)
+            closePageModal(); });
+
+        async function submitApplication(event) {
+            event.preventDefault();
+            if (!currentUser) { alert('कृपया पहले साइन इन करें。');
+                openAuthModal(); return; }
+            const btn = document.getElementById('submitBtn');
+            const sMsg = document.getElementById('successMsg');
+            const eMsg = document.getElementById('errorMsg');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> जमा हो रहा है...';
+            sMsg.style.display = 'none';
+            eMsg.style.display = 'none';
+            try {
+                const counterSnap = await database.ref('csmCounter').once('value');
+                let next = 1;
+                if (counterSnap.exists()) next = counterSnap.val() + 1;
+                const csmId = 'CSM/' + String(next).padStart(2, '0');
+                const data = {
+                    csmId,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userName: currentUser.displayName,
+                    schoolName: document.getElementById('schoolName').value.trim(),
+                    estYear: document.getElementById('estYear').value.trim(),
+                    shalaDarpanCode: document.getElementById('shalaDarpanCode').value.trim(),
+                    udiseId: document.getElementById('udiseId').value.trim(),
+                    address: document.getElementById('address').value.trim(),
+                    district: document.getElementById('district').value.trim(),
+                    pinCode: document.getElementById('pinCode').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    principalName: document.getElementById('principalName').value.trim(),
+                    computerLab: document.querySelector('input[name="computerLab"]:checked')?.value || '',
+                    library: document.querySelector('input[name="library"]:checked')?.value || '',
+                    smartClass: document.querySelector('input[name="smartClass"]:checked')?.value || '',
+                    pastResults: document.getElementById('pastResults').value.trim(),
+                    submittedAt: new Date().toISOString(),
+                    status: 'registered'
+                };
+                await database.ref('registrations/' + currentUser.uid).set(data);
+                await database.ref('csmCounter').set(next);
+                sMsg.innerHTML =
+                    '<div style="text-align:center;"><div style="width:60px;height:60px;border-radius:50%;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;animation:pulseGreen 2s infinite;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#046A38" stroke-width="3"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><p style="color:#046A38;font-weight:700;">पंजीकरण सफल!</p><p style="font-size:13px;">आपका Click Shala Mission ID:</p><div class="csm-id-display">' +
+                    csmId +
+                    '</div><p style="font-size:11px;color:var(--gray-500);">यह ID भविष्य के सभी संदर्भों के लिए सुरक्षित रखें।</p></div>';
+                sMsg.style.display = 'block';
+                document.getElementById('applicationForm').reset();
+                btn.innerHTML = 'फॉर्म जमा करें';
+                btn.disabled = false;
+                setTimeout(() => { closeApplyFormModal();
+                    sMsg.style.display = 'none';
+                    sMsg.innerHTML = ''; }, 5000);
+            } catch (error) {
+                eMsg.style.display = 'block';
+                eMsg.textContent = 'त्रुटि: ' + error.message;
+                btn.innerHTML = 'फॉर्म जमा करें';
+                btn.disabled = false;
+            }
+        }
+
+        function getPrivacyHTML() {
+            return `<h2 class="hindi">प्राइवेसी पॉलिसी (Privacy Policy)</h2><p style="font-size:11px;color:var(--gray-400);">अंतिम अपडेट: 28 जून 2026</p><h3 style="color:var(--navy);">हम कौन हैं (WHO WE ARE)</h3><p style="font-size:13px;">यह प्राइवेसी पॉलिसी 'क्लिक शाला' (Click Shala) द्वारा संचालित 'क्लिक शाला मिशन 1' (सत्र 2026-27 हेतु राजकीय विद्यालयों के लिए डिजिटल एकीकरण प्रोजेक्ट) की डेटा सुरक्षा प्रथाओं और नियमों की व्याख्या करती है। जहाँ हम "संस्था", "हम" या "हमारे" शब्दों का उपयोग करते हैं, उसका तात्पर्य क्लिक शाला (CSM) से है।</p><p style="font-size:13px;">यह पॉलिसी हमारी सेवाओं और निःशुल्क वेबसाइट निर्माण पहल का एक अभिन्न अंग है। हम सरकारी विद्यालयों के डिजिटल एकीकरण के साथ-साथ उनके डेटा की सुरक्षा और गोपनीयता को सर्वोच्च प्राथमिकता देते हैं।</p><h3 style="color:var(--navy);">1. परिभाषाएं (DEFINITIONS)</h3><p style="font-size:13px;"><strong>विद्यालय की जानकारी (Application Information):</strong> वेबसाइट निर्माण हेतु आवश्यक सामग्री — जैसे विद्यालय का विवरण, स्टाफ की सूची, तस्वीरें, संपर्क सूत्र, और शाला दर्पण पर उपलब्ध सार्वजनिक जानकारी, जो संस्था प्रधान द्वारा प्रमाणित करके CSM को उपलब्ध करवाई जाती है।</p><p style="font-size:13px;"><strong>संस्था प्रधान (Principal):</strong> उस अधिकृत व्यक्ति से है जो विद्यालय का प्रतिनिधित्व करता है और वेबसाइट के लिए जानकारी प्रमाणित करता है।</p><h3 style="color:var(--navy);">2. डेटा एकत्रीकरण और सुरक्षा</h3><ul style="font-size:13px;"><li>कोई गोपनीय जानकारी नहीं: आवेदन के समय संस्था को कोई भी निजी, गोपनीय या वित्तीय जानकारी देने की आवश्यकता नहीं है।</li><li>सार्वजनिक डेटा का उपयोग: केवल 'शाला दर्पण सिटीजन विंडो' पर सार्वजनिक रूप से उपलब्ध जानकारी।</li><li>पोर्टल तैयार होने पर आईडी-पासवर्ड विद्यालय को सौंप दिए जाएंगे।</li></ul><h3 style="color:var(--navy);">3. संपर्क सूत्र</h3><div style="background:var(--gray-50);padding:14px;border-radius:8px;"><p style="font-size:13px;"><strong>क्लिक शाला (CLICK SHALA)</strong><br>ई-कार्यालय: पारलू, बालोतरा (राजस्थान) - 344027<br>संचालक: गोपाल पटेल (संस्थापक, क्लिक शाला)<br>संपर्क: @GOPAL_PRIME / +91-6375241780</p></div>`;
+        }
+
+        function getTermsHTML() {
+            return `<h2 class="hindi">उपयोग की शर्तें एवं नियम (Terms & Conditions)</h2><p style="font-size:11px;color:var(--gray-400);">अंतिम अपडेट: 28 जून 2026</p><p style="font-size:13px;">'क्लिक शाला' (Click Shala) की आधिकारिक वेबसाइट और इसकी सेवाओं में आपका स्वागत है। 'क्लिक शाला मिशन 1' के अंतर्गत आवेदन करने, रजिस्टर करने या हमारी सेवाओं का उपयोग करने से पहले कृपया इन उपयोग की शर्तों (Terms of Use) को ध्यानपूर्वक पढ़ें।</p><p style="font-size:13px;">इस पहल में भाग लेकर या आवेदन प्रस्तुत करके, आप (संबंधित संस्था प्रधान या अधिकृत प्रतिनिधि) इन नियमों और शर्तों से कानूनी रूप से बाध्य होने के लिए अपनी सहमति प्रदान करते हैं। यदि आप इन शर्तों से सहमत नहीं हैं, तो कृपया इस प्रोजेक्ट के लिए आवेदन न करें।</p><h3 style="color:var(--navy);">1. सेवा की प्रकृति</h3><p style="font-size:13px;">'क्लिक शाला' एक पूर्णतः स्वतंत्र, स्वैच्छिक और गैर-लाभकारी (Non-Profit) डिजिटल पहल है। इसका मुख्य उद्देश्य राजस्थान के ग्रामीण अंचलों में स्थित राजकीय माध्यमिक और उच्च माध्यमिक विद्यालयों को निःशुल्क वेब पोर्टल बनाकर प्रदान करना है।</p><h3 style="color:var(--navy);">2. पात्रता और चयन</h3><p style="font-size:13px;">यह प्रोजेक्ट केवल राजकीय माध्यमिक एवं उच्च माध्यमिक विद्यालयों के लिए है। प्रथम चरण में केवल 21 विद्यालयों का चयन 'पहले आओ-पहले पाओ' आधार पर किया जाएगा। CSM के पास किसी भी आवेदन को स्वीकार या अस्वीकार करने का पूर्ण अधिकार सुरक्षित है।</p><h3 style="color:var(--navy);">3. पूर्णतः निःशुल्क सेवा</h3><p style="font-size:13px;">शून्य लागत: विद्यालय से कोई भी आर्थिक शुल्क नहीं लिया जाएगा। भविष्य में भी कोई हिडन चार्ज नहीं।</p><h3 style="color:var(--navy);">4. सामग्री की प्रामाणिकता और देयता</h3><p style="font-size:13px;">वेबसाइट पर प्रदर्शित सूचनाओं की सत्यता की पूरी जिम्मेदारी संबंधित विद्यालय की होगी। 'क्लिक शाला' किसी भी भ्रामक या गलत जानकारी के लिए उत्तरदायी नहीं होगा।</p><h3 style="color:var(--navy);">5. क्षेत्राधिकार</h3><p style="font-size:13px;">किसी भी विवाद की स्थिति में केवल बालोतरा, राजस्थान के न्यायालयों का क्षेत्राधिकार मान्य होगा।</p><div style="background:var(--gray-50);padding:14px;border-radius:8px;margin-top:14px;"><p style="font-size:13px;"><strong>संपर्क:</strong> क्लिक शाला, पारलू, बालोतरा (राज.) 344027 | @GOPAL_PRIME | +91-6375241780</p></div>`;
+        }
+
+        function getMouHTML() {
+            return `<h2 class="hindi">डिजिटल एकीकरण सहमति पत्र (MoU)</h2><p style="font-size:11px;color:var(--gray-400);">क्लिक शाला मिशन-1 (सत्र 2026-27)</p><div style="border:2px dashed var(--gray-300);border-radius:12px;padding:18px;text-align:center;margin:14px 0;"><p style="font-size:13px;">यह सहमति पत्र (Agreement) <strong>'क्लिक शाला'</strong> (प्रथम पक्ष) एवं <strong>राजकीय विद्यालय</strong> (द्वितीय पक्ष) के मध्य निष्पादित किया जा रहा है।</p></div><h3 style="color:var(--navy);">1. पूर्णतः निःशुल्क सेवा</h3><p style="font-size:13px;">₹0 लागत। कोई हिडन चार्ज नहीं।</p><h3 style="color:var(--navy);">2. डेटा उपयोग एवं गोपनीयता</h3><p style="font-size:13px;">केवल शाला दर्पण सिटीजन विंडो की सार्वजनिक जानकारी और संस्था प्रधान द्वारा प्रमाणित डेटा का उपयोग।</p><h3 style="color:var(--navy);">3. वेबसाइट का हस्तांतरण</h3><p style="font-size:13px;">लाइव होने पर एडमिन आईडी-पासवर्ड विद्यालय को सौंपे जाएंगे।</p><h3 style="color:var(--navy);">4. सेवा का उपयोग और प्रतिबंध</h3><p style="font-size:13px;">वेबसाइट का उपयोग केवल शैक्षणिक एवं आधिकारिक कार्यों हेतु। उल्लंघन पर सेवाएं निलंबित।</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:center;margin-top:20px;"><div><div style="border-top:1px solid #000;width:70%;margin:0 auto 4px;"></div><p style="font-size:11px;">संस्था प्रधान / प्रधानाचार्य<br>(द्वितीय पक्ष)</p></div><div><div style="border-top:1px solid #000;width:70%;margin:0 auto 4px;"></div><p style="font-size:11px;">गोपाल पटेल<br>(संस्थापक, क्लिक शाला - प्रथम पक्ष)</p></div></div><p style="font-size:10px;color:var(--gray-500);text-align:center;margin-top:12px;">(यह सहमति पत्र 'क्लिक शाला मिशन 1' के अंतर्गत केवल डिजिटल एकीकरण के स्वैच्छिक सहयोग हेतु मान्य है।)</p><div style="text-align:center;margin-top:14px;"><button onclick="window.print()" style="padding:10px 20px;border-radius:24px;background:var(--navy);color:#fff;border:none;cursor:pointer;font-weight:600;">प्रिंट करें / PDF सेव करें</button></div>`;
+        }
+
+        window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window
+            .scrollY > 40));
+        document.querySelectorAll('.reveal').forEach(el => new IntersectionObserver((e) => { e.forEach(x => { if (x
+                .isIntersecting) x.target.classList.add('visible'); }) }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' })
+            .observe(el));
+        document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) { const t = document
+                .querySelector(this.getAttribute('href'));
+            if (t) { e.preventDefault();
+                t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }));
+        console.log('✅ क्लिक शाला | Click Shala — Complete Website Ready');
+        console.log('🔐 Google Sign-In + Firebase Realtime Database');
+        console.log('🆔 CSM ID Auto-Increment: CSM/01, CSM/02, CSM/03...');
+    </script>
+</body>
+      </html>
